@@ -66,48 +66,11 @@ jobs:
     - name: Setup MSBuild.exe
       uses: microsoft/setup-msbuild@v2
 
-  restore-dependencies:
-    name: Restore Dependencies
-    runs-on: windows-latest
-    needs: setup-dotnet  # Runs only after setup-dotnet job is successful
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Restore Dependencies
-        run: dotnet restore
+    - name: Restore Dependencies
+      run: dotnet restore
         
-  build-app:
-    name: Build Application
-    runs-on: windows-latest
-    needs: restore-dependencies  # Runs only after dependencies are restored
+    - name: Build the Application
+      run: dotnet build
 
-    strategy:
-      matrix:
-        configuration: [Debug, Release]
-
-    env:
-      Solution_Name: HouseRentingSystem.sln  # Adjust if necessary
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Build the Application
-        run: dotnet build $env:Solution_Name --configuration ${{ matrix.configuration }} --no-restore
-
-  run-tests:
-    name: Run Tests
-    runs-on: windows-latest
-    needs: build-app  # Runs only after the app is built
-
-    env:
-      Test_Project_Path: HouseRentingSystem.Tests/HouseRentingSystem.Tests.csproj  # Adjust if needed
-
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
-
-      - name: Run Tests
-        run: dotnet test $env:Test_Project_Path --configuration Release --no-build --verbosity normal
+    - name: Run Tests
+      run: dotnet test 
